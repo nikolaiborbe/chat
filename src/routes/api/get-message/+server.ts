@@ -1,7 +1,7 @@
 // src/routes/api/get-message/+server.ts
 import type { RequestHandler } from '@sveltejs/kit';
 import { DEEPMIND_API_KEY, DEEPSEEK_API_KEY, OPENAI_API_KEY } from '$env/static/private';
-import type { Model } from '../../types';
+import type { Model } from '../../../lib/types/types';
 
 export const POST: RequestHandler = async ({ request }) => {
   const { message, model } = await request.json() as

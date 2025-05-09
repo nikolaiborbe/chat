@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Chatbox from './../components/Chatbox.svelte';
-	import RenderMessage from '../components/RenderMessage.svelte';
-	import type { Message, Model } from './types';
+	import Chatbox from '../lib/components/Chatbox.svelte';
+	import RenderMessage from '../lib/components/RenderMessage.svelte';
+	import type { Message, Model } from "$lib/types/types";
 
 	let bottomAnchor: HTMLDivElement;
 	$effect(() => {

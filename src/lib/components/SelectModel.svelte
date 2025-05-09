@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
 	let { models, model = $bindable() } = $props();
-	import type { Model } from "../routes/types";
+	import type { Model } from "$lib/types/types";
 
 	let current_model: Model = $derived(model);
 	let open = $state(false);

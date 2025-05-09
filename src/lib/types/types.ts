@@ -1,4 +1,3 @@
-
 export type Model = {
   model: string;
   company: string;
