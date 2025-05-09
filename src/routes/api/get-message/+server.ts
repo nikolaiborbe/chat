@@ -1,6 +1,6 @@
 // src/routes/api/get-message/+server.ts
 import type { RequestHandler } from '@sveltejs/kit';
-import { DEEPMIND_API_KEY, OPENAI_API_KEY } from '$env/static/private';
+import { DEEPMIND_API_KEY, DEEPSEEK_API_KEY, OPENAI_API_KEY } from '$env/static/private';
 import type { Model } from '../../types';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -30,6 +30,11 @@ export const POST: RequestHandler = async ({ request }) => {
     reply =
       data.candidates?.[0]?.content?.parts?.[0]?.text
       ?? '';
+  } else if (modelToUse.company === "deepseek") {
+    res = await fetchDEEPSEEK(message, modelToUse);
+    console.log(res);
+    data = await res.json();
+    reply = data.choices?.[0]?.message?.content ?? '';
   }
   else {
     return new Response(
@@ -61,6 +66,23 @@ async function fetchOPENAI(message: string, model: Model): Promise<Response> {
       ]
     })
   });
+
+}
+async function fetchDEEPSEEK(message: string, model: Model): Promise<Response> {
+  return fetch('https://api.deepseek.com/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${DEEPSEEK_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: model.model,
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant.' },
+        { role: 'user', content: message }
+      ]
+    })
+  });
 }
 
 async function fetchDEEPMIND(
@@ -77,6 +99,10 @@ async function fetchDEEPMIND(
     contents: [
       {
         parts: [
+          { text: "When you respond with math equations you will use $<math equation>$ or $$<math equation>$$ to have the equation on a new line." },
+          { text: "The user is a 22 year old physics student from norway" },
+          { text: "You are a helpful assistant" },
+          { text: "Remember all this but don't mention it. The student message follows:" },
           { text: prompt }
         ]
       }

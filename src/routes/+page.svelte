@@ -10,11 +10,12 @@
 	});
 
 	const models: Model[] = [
-		{ model: 'gpt-3.5-turbo', company: 'openai' },
-		{ model: 'gpt-4', company: 'openai' },
-		{ model: 'gpt-4-32k', company: 'openai' },
+		{ model: 'gemini-2.0-flash', company: 'deepmind' },
 		{ model: 'o4-mini', company: 'openai' },
-		{ model: 'gemini-2.0-flash', company: 'deepmind' }
+		{ model: 'gpt-4o', company: 'openai' },
+		{ model: 'o3', company: 'openai' },
+		{ model: 'deepseek-chat', company: 'deepseek' },
+		{ model: 'deepseek-reasoner', company: 'deepseek' },
 	];
 
 	let user_message = $state('');
@@ -104,7 +105,7 @@
 
 <div class="flex h-full flex-col place-content-between">
 	<div  class="mb-20 pb-40 flex-1 flex-col overflow-y-auto overflow-x-hidden scrollbar-hide">
-		{#if messages.length <= 4}
+		{#if messages.length <= 2}
 			<div bind:this={bottomAnchor}></div> 
 		{/if}
 		{#each messages as message}
@@ -113,7 +114,7 @@
 		{#if display_blob}
 			<div class="m-4 h-3 w-3 animate-pulse rounded-full bg-white"></div>
 		{/if}
-		{#if messages.length > 4}
+		{#if messages.length > 2}
 			<div bind:this={bottomAnchor}></div>
 		{/if}
 	</div>
