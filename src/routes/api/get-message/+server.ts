@@ -1,10 +1,11 @@
 // src/routes/api/get-message/+server.ts
 import type { RequestHandler } from '@sveltejs/kit';
-import { OPENAI_API_KEY } from '$env/static/private';
+import { DEEPMIND_API_KEY, OPENAI_API_KEY } from '$env/static/private';
+import type { Model } from '../../types';
 
 export const POST: RequestHandler = async ({ request }) => {
   const { message, model } = await request.json() as
-    { message?: string; model?: string };
+    { message?: string; model?: Model };
 
   if (!message) {
     return new Response(
@@ -13,37 +14,81 @@ export const POST: RequestHandler = async ({ request }) => {
     );
   }
 
-  const modelToUse = model ?? 'gpt-4o';
+  const modelToUse: Model = model ?? { model: 'gpt-3.5-turbo', company: 'openai' };
 
-  // call OpenAI
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: modelToUse,    // or whichever model you want
-      messages: [
-        { role: 'system', content: 'You are a helpful assistant.' },
-        { role: 'user', content: message }
-      ]
-    })
-  });
+  let res: Response;
+  let reply: string = '';
+  let data: any;
 
-  if (!res.ok) {
-    const err = await res.json();
+  if (modelToUse.company === 'openai') {
+    res = await fetchOPENAI(message, modelToUse);
+    data = await res.json();
+    reply = data.choices?.[0]?.message?.content ?? '';
+  } else if (modelToUse.company === "deepmind") {
+    res = await fetchDEEPMIND(message, modelToUse);
+    data = await res.json();
+    reply =
+      data.candidates?.[0]?.content?.parts?.[0]?.text
+      ?? '';
+  }
+  else {
     return new Response(
-      JSON.stringify({ error: err }),
-      { status: res.status }
+      JSON.stringify({ error: 'Unsupported model' }),
+      { status: 400 }
     );
   }
 
-  const data = await res.json();
-  const reply = data.choices?.[0]?.message?.content ?? '';
+
 
   return new Response(
     JSON.stringify({ reply }),
     { headers: { 'Content-Type': 'application/json' } }
   );
 };
+
+async function fetchOPENAI(message: string, model: Model): Promise<Response> {
+  return fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${OPENAI_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: model.model,
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant.' },
+        { role: 'user', content: message }
+      ]
+    })
+  });
+}
+
+async function fetchDEEPMIND(
+  prompt: string,
+  model: Model
+): Promise<Response> {
+  // build the URL with your API key
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/` +
+    `${encodeURIComponent(model.model)}:generateContent?key=` +
+    `${encodeURIComponent(DEEPMIND_API_KEY)}`;
+
+  // construct the body in the shape the API expects
+  const body = {
+    contents: [
+      {
+        parts: [
+          { text: prompt }
+        ]
+      }
+    ]
+  };
+
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+      // no Authorization header needed when using ?key=
+    },
+    body: JSON.stringify(body)
+  });
+}

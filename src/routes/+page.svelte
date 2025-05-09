@@ -1,21 +1,21 @@
 <script lang="ts">
 	import Chatbox from './../components/Chatbox.svelte';
 	import RenderMessage from '../components/RenderMessage.svelte';
+	import type { Message, Model } from './types';
 
-	const models = ["gpt-3.5-turbo", "gpt-4", "gpt-4-32k", "o4-mini"];
+	const models: Model[] = [
+		{ model: 'gpt-3.5-turbo', company: 'openai' },
+		{ model: 'gpt-4', company: 'openai' },
+		{ model: 'gpt-4-32k', company: 'openai' },
+		{ model: 'o4-mini', company: 'openai' },
+		{ model: "gemini-2.0-flash", company: "deepmind" },
+	];
 
 	let user_message = $state('');
 	let model = $state(models[0]);
 	let user = 'Nikolai G. Borbe';
 
-	type Message = {
-		user: string | 'AI';
-		time: string;
-		content: string;
-	};
-
 	let messages: Message[] = $state([]);
-
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Enter' && !event.shiftKey) {
@@ -46,7 +46,7 @@
 			},
 			body: JSON.stringify({
 				message: msg,
-				model: model,
+				model: model
 			})
 		});
 
@@ -59,7 +59,7 @@
 		messages = [
 			...messages,
 			{
-				user: 'AI',
+				user: model.model,
 				time: new Date().toLocaleTimeString(),
 				content: reply
 			}
@@ -67,14 +67,14 @@
 	}
 </script>
 
-
-
 {#snippet chat(message: Message)}
-	{#if message.user === 'AI'}
-		<div class="flex w-full justify-start">
-			<div class="m-2 flex md:w-3/4 flex-col rounded-3xl p-4 text-white">
+	{#if message.user !== user}
+		<div class="flex flex-col w-full items-start justify-start m-2 p-4">
+			<div class="flex flex-col rounded-3xl text-white md:w-3/4">
 				<RenderMessage message={message.content} />
 			</div>
+			<p class="flex text-sm text-gray-500">{message.user} · {message.time}</p>
+
 		</div>
 	{:else}
 		<div class="flex w-full justify-end">
@@ -86,14 +86,13 @@
 {/snippet}
 
 <div class="flex h-full flex-col place-content-between">
-	<div class="pb-40 mb-20">
+	<div class="mb-20 pb-40">
 		{#each messages as message}
 			{@render chat(message)}
 		{/each}
 	</div>
 
-	<div class="flex justify-center w-full ">
+	<div class="flex w-full justify-center">
 		<Chatbox {onSubmit} {handleKeyDown} {models} bind:model bind:user_message />
-
 	</div>
 </div>

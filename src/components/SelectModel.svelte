@@ -1,8 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
 	let { models, model = $bindable() } = $props();
+	import type { Model } from "../routes/types";
 
-	let current_model = $derived(model);
+	let current_model: Model = $derived(model);
 	let open = $state(false);
 
 	function handleClick() {
@@ -26,7 +27,7 @@
 						open = false;
 					}}
 				>
-					{m}
+					{m.model}
 				</button>
 			{/each}
 		</div>
@@ -36,6 +37,6 @@
 		onclick={handleClick}
 		class="mx-2 cursor-pointer rounded-full p-1 px-4 outline outline-[#424242]"
 	>
-		{current_model}
+		{current_model.model}
 	</button>
 </div>
