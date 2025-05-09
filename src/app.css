@@ -5,16 +5,27 @@ body {
 }
 
 @layer base {
-    /* make the <html> element the gradient background */
-    html {
-        background-color: #302f35;
-    }
-  
-    /* let body & main be transparent so gradient shows through */
-    body,
-    main {
-      background: transparent;
-      /* ensure main fills the visible viewport height on mobile */
-      min-height: 100svh;
-    }
-  }
+	/* make the <html> element the gradient background */
+	html {
+		background-color: #302f35;
+	}
+
+	/* let body & main be transparent so gradient shows through */
+	body,
+	main {
+		background: transparent;
+		/* ensure main fills the visible viewport height on mobile */
+		min-height: 100svh;
+	}
+}
+
+/* For Webkit-based browsers (Chrome, Safari and Opera) */
+.scrollbar-hide::-webkit-scrollbar {
+	display: none;
+}
+
+/* For IE, Edge and Firefox */
+.scrollbar-hide {
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+}

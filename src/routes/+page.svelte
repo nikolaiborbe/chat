@@ -3,6 +3,12 @@
 	import RenderMessage from '../components/RenderMessage.svelte';
 	import type { Message, Model } from './types';
 
+	let bottomAnchor: HTMLDivElement;
+	$effect(() => {
+		messages.length;      // dependency tracking
+		bottomAnchor?.scrollIntoView({ behavior: 'smooth' });
+	});
+
 	const models: Model[] = [
 		{ model: 'gpt-3.5-turbo', company: 'openai' },
 		{ model: 'gpt-4', company: 'openai' },
@@ -15,6 +21,8 @@
 	let model = $state(models[0]);
 	let user = 'Nikolai G. Borbe';
 	let display_blob = $state(false);
+
+	// scroll to the bottom every time the list changes
 
 	let messages: Message[] = $state([]);
 
@@ -70,8 +78,11 @@
 	}
 </script>
 
-{#if messages.length < 2}
-	<div class="pt-40"></div>
+{#if !messages.length}
+	<div class="absolute top-1/2 left-1/2 flex w-full -translate-x-1/2 -translate-y-1/2 transform flex-col items-center justify-center text-center">
+		<p>No history, no memories. Just chat.</p>
+	</div>
+
 {/if}
 
 {#snippet chat(message: Message)}
@@ -84,7 +95,7 @@
 		</div>
 	{:else}
 		<div class="flex w-full justify-end">
-			<div class="m-2 flex w-fit min-w-10 flex-col rounded-4xl bg-[#303030] px-5 py-3 text-white">
+			<div class="m-2 flex w-fit min-w-10 flex-col md:max-w-3/4 rounded-4xl bg-[#303030] outline outline-[#363636] px-5 py-3 text-white">
 				<RenderMessage message={message.content} />
 			</div>
 		</div>
@@ -92,12 +103,18 @@
 {/snippet}
 
 <div class="flex h-full flex-col place-content-between">
-	<div class="mb-20 pb-40">
+	<div  class="mb-20 pb-40 flex-1 flex-col overflow-y-auto overflow-x-hidden scrollbar-hide">
+		{#if messages.length <= 4}
+			<div bind:this={bottomAnchor}></div> 
+		{/if}
 		{#each messages as message}
 			{@render chat(message)}
 		{/each}
 		{#if display_blob}
 			<div class="m-4 h-3 w-3 animate-pulse rounded-full bg-white"></div>
+		{/if}
+		{#if messages.length > 4}
+			<div bind:this={bottomAnchor}></div>
 		{/if}
 	</div>
 
