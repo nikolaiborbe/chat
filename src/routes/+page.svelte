@@ -8,12 +8,13 @@
 		{ model: 'gpt-4', company: 'openai' },
 		{ model: 'gpt-4-32k', company: 'openai' },
 		{ model: 'o4-mini', company: 'openai' },
-		{ model: "gemini-2.0-flash", company: "deepmind" },
+		{ model: 'gemini-2.0-flash', company: 'deepmind' }
 	];
 
 	let user_message = $state('');
 	let model = $state(models[0]);
 	let user = 'Nikolai G. Borbe';
+	let display_blob = $state(false);
 
 	let messages: Message[] = $state([]);
 
@@ -39,6 +40,7 @@
 			}
 		];
 
+		display_blob = true;
 		const res = await fetch('/api/get-message/', {
 			method: 'POST',
 			headers: {
@@ -64,17 +66,21 @@
 				content: reply
 			}
 		];
+		display_blob = false;
 	}
 </script>
 
+{#if messages.length < 2}
+	<div class="pt-40"></div>
+{/if}
+
 {#snippet chat(message: Message)}
 	{#if message.user !== user}
-		<div class="flex flex-col w-full items-start justify-start m-2 p-4">
+		<div class="m-2 flex w-full flex-col items-start justify-start">
 			<div class="flex flex-col rounded-3xl text-white md:w-3/4">
 				<RenderMessage message={message.content} />
 			</div>
 			<p class="flex text-sm text-gray-500">{message.user} · {message.time}</p>
-
 		</div>
 	{:else}
 		<div class="flex w-full justify-end">
@@ -90,6 +96,9 @@
 		{#each messages as message}
 			{@render chat(message)}
 		{/each}
+		{#if display_blob}
+			<div class="m-4 h-3 w-3 animate-pulse rounded-full bg-white"></div>
+		{/if}
 	</div>
 
 	<div class="flex w-full justify-center">
