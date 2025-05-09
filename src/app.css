@@ -1,0 +1,20 @@
+@import 'tailwindcss';
+
+body {
+	color: white;
+}
+
+@layer base {
+    /* make the <html> element the gradient background */
+    html {
+        background-color: #302f35;
+    }
+  
+    /* let body & main be transparent so gradient shows through */
+    body,
+    main {
+      background: transparent;
+      /* ensure main fills the visible viewport height on mobile */
+      min-height: 100svh;
+    }
+  }
