@@ -61,6 +61,7 @@ async function fetchOPENAI(message: string, model: Model): Promise<Response> {
     body: JSON.stringify({
       model: model.model,
       messages: [
+        { role: "system", content: "When you respond with math equations you will use $<math equation>$ or $$<math equation>$$ to have the equation on a new line." },
         { role: 'system', content: 'You are a helpful assistant.' },
         { role: 'user', content: message }
       ]

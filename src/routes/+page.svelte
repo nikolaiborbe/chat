@@ -104,7 +104,7 @@
 {/snippet}
 
 <div class="flex h-full flex-col place-content-between">
-	<div  class="mb-20 pb-40 flex-1 flex-col overflow-y-auto overflow-x-hidden scrollbar-hide">
+	<div  class="mb-20 pb-40 flex-1 flex-col">
 		{#if messages.length <= 2}
 			<div bind:this={bottomAnchor}></div> 
 		{/if}
